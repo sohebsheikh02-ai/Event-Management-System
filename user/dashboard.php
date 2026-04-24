@@ -1,7 +1,9 @@
 <?php
 $page_title = 'My Dashboard';
-require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/auth.php';
 require_login();
+require_once __DIR__ . '/../includes/header.php';
 
 $uid = $_SESSION['user_id'];
 $stmt = $conn->prepare("

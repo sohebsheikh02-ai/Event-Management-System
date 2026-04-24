@@ -1,7 +1,9 @@
 <?php
 $page_title='Registrations';
-require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/auth.php';
 require_admin();
+require_once __DIR__ . '/../includes/header.php';
 $rows=$conn->query("
   SELECT r.id, r.registered_at, u.name user_name, u.email, e.title event_title,
          i.id inv_id, i.invoice_number, i.amount, i.status

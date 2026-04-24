@@ -1,7 +1,9 @@
 <?php
 $page_title='Users';
-require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/auth.php';
 require_admin();
+require_once __DIR__ . '/../includes/header.php';
 $users=$conn->query("SELECT id,name,email,phone,created_at FROM users ORDER BY created_at DESC");
 ?>
 <h1>Registered Users</h1>
