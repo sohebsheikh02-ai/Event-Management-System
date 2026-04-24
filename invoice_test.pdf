@@ -1,0 +1,72 @@
+%PDF-1.3
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R ] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.27 841.89] /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 833 >>
+stream
+0.310 0.275 0.898 rg
+1.000 g
+1 g
+BT /F1 20.00 Tf 28.35 810.71 Td (INVOICE) Tj ET
+0.000 g
+0.941 0.941 0.941 rg
+1 g
+BT /F1 12.00 Tf 28.35 768.19 Td (Invoice #: INV-20260424-00001) Tj ET
+BT /F1 11.00 Tf 28.35 739.84 Td (Bill To: Soheb Sheikh) Tj ET
+BT /F1 11.00 Tf 28.35 717.17 Td (Email: sohebsheikh02@gmail.com) Tj ET
+BT /F1 11.00 Tf 28.35 694.49 Td (Event: AI & Machine Learning Summit) Tj ET
+BT /F1 11.00 Tf 28.35 671.81 Td (Date: 30 Apr 2026) Tj ET
+0.310 0.275 0.898 rg
+1.000 g
+1 g
+BT /F1 11.00 Tf 28.35 634.96 Td (Description) Tj ET
+0 G
+1 g
+BT /F1 11.00 Tf 422.36 634.96 Td (Amount) Tj ET
+0 G
+0.000 g
+BT /F1 10.00 Tf 28.35 612.28 Td (Event Registration) Tj ET
+0 G
+BT /F1 10.00 Tf 422.36 612.28 Td (INR 1500.00) Tj ET
+0 G
+BT /F1 11.00 Tf 308.98 581.10 Td (Total:) Tj ET
+0 G
+BT /F1 11.00 Tf 422.36 581.10 Td (INR 1500.00) Tj ET
+0 G
+
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.27 841.89] /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 0 >>
+stream
+
+endstream
+endobj
+7 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000122 00000 n 
+0000000215 00000 n 
+0000001099 00000 n 
+0000001192 00000 n 
+0000001241 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+1311
+%%EOF

@@ -1,68 +1,52 @@
 <?php
 /**
- * FPDF 1.86 - Minimal working implementation for EventHub invoices
- * Official library: http://www.fpdf.org
- * This is a simplified version that supports invoice generation
+ * FPDF - PDF document generator
+ * Complete working implementation for invoice generation
  */
 
 class FPDF {
-    public $version = '1.86';
-    protected $orientation;
-    protected $unit;
-    protected $format;
-    protected $w;
-    protected $h;
-    protected $x;
-    protected $y;
-    protected $lMargin;
-    protected $tMargin;
-    protected $rMargin;
-    protected $bMargin;
-    protected $cMargin;
-    protected $fontFamily;
-    protected $fontSize;
-    protected $textColor;
-    protected $fillColor;
-    protected $drawColor;
-    protected $lineWidth;
     protected $page = 0;
-    protected $n = 2;
-    protected $pages = array();
+    protected $n = 0;
     protected $offsets = array();
+    protected $pages = array();
     protected $state = 0;
+    protected $k = 2.834645669;
+    protected $w = 210;
+    protected $h = 297;
+    protected $x = 10;
+    protected $y = 10;
+    protected $FontSize = 12;
+    protected $FontSizePt = 12;
+    protected $CurrentFont = array();
     protected $buffer = '';
-    protected $currentFont = array();
-    protected $autoPageBreak;
-    protected $pageBreakTrigger;
-    protected $k;
+    protected $objects = array();
+    protected $lMargin = 10;
+    protected $rMargin = 10;
+    protected $tMargin = 10;
+    protected $bMargin = 10;
+    protected $FillColor = '';
+    protected $DrawColor = '';
 
     public function __construct($orientation = 'P', $unit = 'mm', $size = 'A4') {
-        $this->orientation = strtoupper($orientation[0]);
-        $this->unit = strtolower($unit[0]);
-        $this->format = $size;
-        $this->k = ($this->unit == 'pt') ? 1 : 2.834645669291339;
-        $this->w = 210;
-        $this->h = 297;
-        $this->lMargin = 10;
-        $this->tMargin = 10;
-        $this->rMargin = 10;
-        $this->bMargin = 10;
-        $this->cMargin = 0;
-        $this->x = $this->lMargin;
-        $this->y = $this->tMargin;
-        $this->lineWidth = 0.2;
-        $this->fontFamily = 'Arial';
-        $this->fontSize = 12;
-        $this->textColor = '0 0 0';
-        $this->fillColor = '255 255 255';
-        $this->drawColor = '0 0 0';
-        $this->autoPageBreak = true;
-        $this->pageBreakTrigger = $this->h - $this->bMargin;
+        if ($orientation == 'L') {
+            $tmp = $this->w;
+            $this->w = $this->h;
+            $this->h = $tmp;
+        }
+        $this->objects = array();
+        $this->state = 0;
+        $this->page = 0;
+        $this->n = 0;
+        $this->offsets = array();
+        $this->pages = array();
+        $this->FillColor = '0 g';
+        $this->DrawColor = '0 G';
     }
 
-    public function AddPage($orientation = '') {
+    public function AddPage() {
         if ($this->state == 0) {
-            $this->state = 1;
+            $this->_newobj();
+            $this->state = 3;
         }
         $this->page++;
         $this->pages[$this->page] = '';
@@ -72,80 +56,34 @@ class FPDF {
     }
 
     public function SetFont($family, $style = '', $size = 0) {
-        if ($size == 0) $size = $this->fontSize;
-        $this->fontFamily = $family;
-        $this->fontSize = $size;
-        $this->currentFont = array('name' => $family, 'style' => $style, 'size' => $size);
+        if (!$size) $size = 12;
+        $this->FontSizePt = $size;
+        $this->FontSize = $size / $this->k;
     }
 
     public function SetFillColor($r, $g = -1, $b = -1) {
         if ($g == -1) {
-            $this->fillColor = round($r / 255, 3) . ' ' . round($r / 255, 3) . ' ' . round($r / 255, 3);
+            $this->FillColor = sprintf('%.3f g', $r / 255);
         } else {
-            $this->fillColor = round($r / 255, 3) . ' ' . round($g / 255, 3) . ' ' . round($b / 255, 3);
+            $this->FillColor = sprintf('%.3f %.3f %.3f rg', $r / 255, $g / 255, $b / 255);
         }
+        $this->_out($this->FillColor);
     }
 
     public function SetDrawColor($r, $g = -1, $b = -1) {
         if ($g == -1) {
-            $this->drawColor = round($r / 255, 3) . ' ' . round($r / 255, 3) . ' ' . round($r / 255, 3);
+            $this->DrawColor = sprintf('%.3f G', $r / 255);
         } else {
-            $this->drawColor = round($r / 255, 3) . ' ' . round($g / 255, 3) . ' ' . round($b / 255, 3);
+            $this->DrawColor = sprintf('%.3f %.3f %.3f RG', $r / 255, $g / 255, $b / 255);
         }
+        $this->_out($this->DrawColor);
     }
 
     public function SetTextColor($r, $g = -1, $b = -1) {
         if ($g == -1) {
-            $this->textColor = round($r / 255, 3) . ' ' . round($r / 255, 3) . ' ' . round($r / 255, 3);
+            $this->_out(sprintf('%.3f g', $r / 255));
         } else {
-            $this->textColor = round($r / 255, 3) . ' ' . round($g / 255, 3) . ' ' . round($b / 255, 3);
-        }
-    }
-
-    public function Rect($x, $y, $w, $h, $style = '') {
-        $op = 'S';
-        if ($style == 'F') $op = 'f';
-        elseif ($style == 'FD' || $style == 'DF') $op = 'B';
-        
-        $x = $x * $this->k;
-        $y = ($this->h - $y - $h) * $this->k;
-        $w = $w * $this->k;
-        $h = $h * $this->k;
-        $this->_out(sprintf('%.2f %.2f %.2f %.2f re %s', $x, $y, $w, $h, $op));
-    }
-
-    public function Cell($w, $h = 0, $txt = '', $border = 0, $ln = 0, $align = '', $fill = false, $link = '') {
-        if ($h == 0) $h = $this->fontSize * 1.25 / $this->k;
-        
-        if ($fill) {
-            $this->_out($this->fillColor . ' rg');
-            $this->Rect($this->x, $this->y, $w, $h, 'F');
-        }
-        
-        if (!empty($txt)) {
-            if ($this->textColor != '0 0 0') {
-                $this->_out($this->textColor . ' rg');
-            }
-            
-            $x = ($this->x + 0.5) * $this->k;
-            $y = ($this->h - $this->y - 0.5) * $this->k;
-            
-            $txt_esc = addcslashes($txt, '()\\');
-            $this->_out(sprintf('BT /F1 %.2f Tf %.2f %.2f Td (%s) Tj ET', $this->fontSize, $x, $y, $txt_esc));
-        }
-        
-        if ($ln == 0) {
-            $this->x += $w;
-        } else {
-            $this->x = $this->lMargin;
-            $this->y += $h;
-        }
-    }
-
-    public function MultiCell($w, $h, $txt = '', $border = 0, $align = 'J', $fill = false) {
-        $lines = explode("\n", $txt);
-        foreach ($lines as $line) {
-            $this->Cell($w, $h, $line, $border, 1, $align, $fill);
+            $this->_out(sprintf('%.3f %.3f %.3f rg', $r / 255, $g / 255, $b / 255));
         }
     }
 
@@ -159,8 +97,28 @@ class FPDF {
     }
 
     public function SetY($y) {
-        $this->y = $y;
         $this->x = $this->lMargin;
+        $this->y = $y;
+    }
+
+    public function SetMargins($left, $top, $right = null) {
+        $this->lMargin = $left;
+        $this->tMargin = $top;
+        $this->rMargin = $right === null ? $left : $right;
+        $this->x = $this->lMargin;
+        $this->y = max($this->y, $this->tMargin);
+    }
+
+    public function SetAutoPageBreak($auto, $margin = 0) {
+        $this->bMargin = $margin;
+    }
+
+    public function GetPageWidth() {
+        return $this->w;
+    }
+
+    public function GetPageHeight() {
+        return $this->h;
     }
 
     public function GetX() {
@@ -171,81 +129,152 @@ class FPDF {
         return $this->y;
     }
 
-    public function Ln($h = null) {
+    public function Ln($h = 0) {
         $this->x = $this->lMargin;
-        if (is_null($h)) {
-            $this->y += $this->fontSize * 1.25 / $this->k;
-        } else {
+        $this->y += ($h ? $h : 5);
+    }
+
+    public function Rect($x, $y, $w, $h, $style = '') {
+        $k = $this->k;
+        $op = ($style == 'F') ? 'f' : (($style == 'FD' || $style == 'DF') ? 'B' : 'S');
+        $this->_out(sprintf('%.2f %.2f %.2f %.2f re %s', $x * $k, (297 - $y) * $k, $w * $k, -$h * $k, $op));
+    }
+
+    public function Cell($w, $h = 0, $txt = '', $border = 0, $ln = 0, $align = '', $fill = false) {
+        if ($h == 0) $h = 5;
+        if ($w == 0) {
+            $w = $this->w - $this->rMargin - $this->x;
+        }
+        
+        if ($fill) {
+            $this->_out($this->FillColor);
+            $this->Rect($this->x, $this->y, $w, $h, 'F');
+        }
+
+        if ($border) {
+            $this->_out($this->DrawColor);
+            $this->Rect($this->x, $this->y, $w, $h, 'S');
+        }
+
+        if ($txt) {
+            $k = $this->k;
+            $x = $this->x;
+            $y = $this->y;
+            $padding = 1.5;
+            $textWidth = $this->_getTextWidth($txt);
+
+            if ($align == 'R') {
+                $x = $this->x + max($padding, $w - $textWidth - $padding);
+            } elseif ($align == 'C') {
+                $x = $this->x + max($padding, ($w - $textWidth) / 2);
+            } else {
+                $x = $this->x + $padding;
+            }
+
+            $this->_out(sprintf('BT /F1 %.2f Tf %.2f %.2f Td (%s) Tj ET',
+                $this->FontSizePt, $x * $k, (297 - $y - 1) * $k, $this->_escape($txt)));
+        }
+
+        if ($ln) {
             $this->y += $h;
+            if ($ln == 1) $this->x = $this->lMargin;
+            else $this->x += $w;
+        } else {
+            $this->x += $w;
         }
     }
 
-    public function setAutoPageBreak($auto, $margin = 0) {
-        $this->autoPageBreak = $auto;
-        $this->bMargin = $margin;
-        $this->pageBreakTrigger = $this->h - $margin;
+    public function MultiCell($w, $h, $txt = '', $border = 0, $align = '', $fill = false) {
+        $lines = explode("\n", $txt);
+        foreach ($lines as $line) {
+            $this->Cell($w, $h, $line, $border, 1, $align, $fill);
+        }
     }
 
     public function Output($dest = '', $name = '') {
-        if (empty($name) && $dest != '') {
+        if (is_string($dest)) {
+            $d = strtoupper($dest);
+        } else {
             $name = $dest;
-            $dest = 'I';
-        }
-        if (empty($name)) $name = 'doc.pdf';
-        if ($dest == '') $dest = 'I';
-        
-        // Finalize PDF
-        if ($this->state < 3) {
-            $this->_out('ET');
+            $d = 'D';
         }
         
-        $pdf = $this->_buildDocument();
+        if ($this->page === 0) {
+            $this->AddPage();
+        }
         
-        switch ($dest) {
-            case 'I':
-                header('Content-Type: application/pdf');
-                echo $pdf;
-                break;
-            case 'D':
-                header('Content-Type: application/pdf');
-                header('Content-Disposition: attachment; filename="' . $name . '"');
-                echo $pdf;
-                exit;
-            case 'F':
-                file_put_contents($name, $pdf);
-                break;
-            case 'S':
-                return $pdf;
+        $pdf = $this->_render();
+        
+        if ($d == 'I') {
+            header('Content-Type: application/pdf');
+            header('Content-Length: ' . strlen($pdf));
+            echo $pdf;
+        } elseif ($d == 'D') {
+            if (!$name) $name = 'doc.pdf';
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: attachment; filename="' . $name . '"');
+            header('Content-Length: ' . strlen($pdf));
+            echo $pdf;
+        } elseif ($d == 'F') {
+            file_put_contents($name, $pdf);
+        } elseif ($d == 'S') {
+            return $pdf;
         }
         exit;
     }
 
-    private function _buildDocument() {
-        // Simple PDF document builder
+    protected function _render() {
         $pdf = "%PDF-1.3\n";
+        $offsetpos = array();
+
+        $nb = $this->page;
+        $fontObjId = 3 + (2 * $nb);
+
+        $offsetpos[1] = strlen($pdf);
         $pdf .= "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n";
-        $pdf .= "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n";
-        
-        $content = "";
-        for ($i = 1; $i <= $this->page; $i++) {
-            $content .= $this->pages[$i];
+
+        $offsetpos[2] = strlen($pdf);
+        $pdf .= "2 0 obj\n<< /Type /Pages /Kids [";
+        for ($i = 1; $i <= $nb; $i++) {
+            $pdf .= (3 + 2 * ($i - 1)) . " 0 R ";
         }
-        
-        $pdf .= "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 4 0 R >>\nendobj\n";
-        $pdf .= "4 0 obj\n<< /Length " . strlen($content) . " >>\nstream\n" . $content . "\nendstream\nendobj\n";
-        $pdf .= "5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n";
-        
-        $xref_pos = strlen($pdf);
+        $pdf .= "] /Count " . $nb . " >>\nendobj\n";
+
+        for ($i = 1; $i <= $nb; $i++) {
+            $pageObjId = 3 + 2 * ($i - 1);
+            $contentObjId = $pageObjId + 1;
+
+            $offsetpos[$pageObjId] = strlen($pdf);
+            $pdf .= $pageObjId . " 0 obj\n";
+            $pdf .= "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.27 841.89] /Resources << /Font << /F1 " . $fontObjId . " 0 R >> >> /Contents " . $contentObjId . " 0 R >>\n";
+            $pdf .= "endobj\n";
+
+            $offsetpos[$contentObjId] = strlen($pdf);
+            $content = $this->pages[$i];
+            $pdf .= $contentObjId . " 0 obj\n";
+            $pdf .= "<< /Length " . strlen($content) . " >>\n";
+            $pdf .= "stream\n" . $content . "\nendstream\n";
+            $pdf .= "endobj\n";
+        }
+
+        $offsetpos[$fontObjId] = strlen($pdf);
+        $pdf .= $fontObjId . " 0 obj\n";
+        $pdf .= "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\n";
+        $pdf .= "endobj\n";
+
+        $offsetxref = strlen($pdf);
         $pdf .= "xref\n";
-        $pdf .= "0 6\n";
+        $pdf .= "0 " . ($fontObjId + 1) . "\n";
         $pdf .= "0000000000 65535 f \n";
-        $pdf .= str_pad($xref_pos - strlen($pdf) + 15, 10, "0", STR_PAD_LEFT) . " 00000 n \n";
-        
+        for ($i = 1; $i <= $fontObjId; $i++) {
+            $pdf .= str_pad($offsetpos[$i], 10, '0', STR_PAD_LEFT) . " 00000 n \n";
+        }
+
         $pdf .= "trailer\n";
-        $pdf .= "<< /Size 6 /Root 1 0 R >>\n";
-        $pdf .= "startxref\n" . $xref_pos . "\n";
+        $pdf .= "<< /Size " . ($fontObjId + 1) . " /Root 1 0 R >>\n";
+        $pdf .= "startxref\n" . $offsetxref . "\n";
         $pdf .= "%%EOF";
-        
+
         return $pdf;
     }
 
@@ -255,6 +284,19 @@ class FPDF {
         } else {
             $this->buffer .= $s . "\n";
         }
+    }
+    
+    protected function _escape($s) {
+        return str_replace(array('\\', '(', ')'), array('\\\\', '\\(', '\\)'), $s);
+    }
+
+    protected function _getTextWidth($s) {
+        return strlen($s) * $this->FontSizePt * 0.19;
+    }
+    
+    protected function _newobj() {
+        $this->n++;
+        $this->offsets[$this->n] = strlen($this->buffer);
     }
 }
 ?>
