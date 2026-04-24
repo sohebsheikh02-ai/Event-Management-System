@@ -55,12 +55,15 @@ function init_database(mysqli $conn): void {
             continue;
         }
 
-        if (!$conn->query($statement)) {
-            $errno = $conn->errno;
+        try {
+            $conn->query($statement);
+        } catch (mysqli_sql_exception $e) {
+            $errno = $e->getCode();
             // 1062 = Duplicate entry (seed data already present) — safe to ignore.
             // 1050 = Table already exists (shouldn't happen with IF NOT EXISTS, but guard anyway).
             if (!in_array($errno, [1062, 1050], true)) {
-                error_log('init_db: query failed (' . $errno . '): ' . $conn->error . ' — SQL: ' . substr($statement, 0, 200));
+                error_log('init_db: query failed (' . $errno . '): ' . $e->getMessage() . ' — SQL: ' . substr($statement, 0, 200));
+                throw $e;
             }
         }
     }
