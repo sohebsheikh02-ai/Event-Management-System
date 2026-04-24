@@ -35,12 +35,26 @@ function init_database(mysqli $conn): void {
 
     // Split on statement boundaries and execute one at a time so that a
     // duplicate-key error on a seed INSERT does not abort the whole batch.
+    //
+    // Use preg_split on semicolons that appear at the end of a line (optionally
+    // followed by an inline comment) rather than a plain explode(';', ...).
+    // A bare explode can leave multi-line INSERT blocks joined together when
+    // the semicolon is not the very last character on its line, causing the
+    // entire seed section to be submitted as a single query and bypassing the
+    // per-statement error handler below.
     $statements = array_filter(
-        array_map('trim', explode(';', $sql)),
+        array_map('trim', preg_split('/;\s*(?:--[^\n]*)?\n/u', $sql)),
         fn(string $s): bool => $s !== ''
     );
 
     foreach ($statements as $statement) {
+        // Strip any trailing inline comment that survived the split (e.g. the
+        // last statement in the file which has no newline after its semicolon).
+        $statement = rtrim($statement, '; ');
+        if ($statement === '') {
+            continue;
+        }
+
         if (!$conn->query($statement)) {
             $errno = $conn->errno;
             // 1062 = Duplicate entry (seed data already present) — safe to ignore.
