@@ -1,0 +1,21 @@
+services:
+  - type: pserv
+    name: event-management-mysql
+    runtime: image
+    image:
+      url: docker.io/mysql:8.0
+    plan: standard
+    region: oregon
+    disk:
+      name: event-management-mysql-data
+      mountPath: /var/lib/mysql
+      sizeGB: 10
+    envVars:
+      - key: MYSQL_DATABASE
+        value: event_management
+      - key: MYSQL_USER
+        value: event_user
+      - key: MYSQL_PASSWORD
+        generateValue: true
+      - key: MYSQL_ROOT_PASSWORD
+        generateValue: true

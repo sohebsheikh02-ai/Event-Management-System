@@ -1,12 +1,12 @@
 # Event Management System (PHP + MySQL)
 
-A complete Event Management System built with **Core PHP**, **MySQL**, and **FPDF** for invoice generation.
+A complete Event Management System built with **Core PHP**, **MySQL**, and browser-friendly HTML invoices.
 
 ## 🚀 Features
 - User registration & login (session-based, password hashing)
 - Browse, search & filter events
 - Register for events (duplicate prevention)
-- **Auto-generate downloadable PDF invoices**
+- Preview and print/download invoices from HTML
 - Admin panel: manage events, users, registrations, invoices
 - Responsive UI with custom CSS (Bootstrap-inspired)
 
@@ -19,7 +19,7 @@ A complete Event Management System built with **Core PHP**, **MySQL**, and **FPD
 - PHP 7.4+
 - MySQL 5.7+ / MariaDB
 - Apache (XAMPP / WAMP / LAMP)
-- FPDF library (included - `pdf/fpdf.php`)
+- Docker (required for Render deployment)
 
 ### 2. Setup (3 Steps)
 1. Copy the `event-management` folder into `htdocs/` (XAMPP) or `www/` (WAMP)
@@ -41,8 +41,8 @@ event-management/
 ├── includes/            # Header, footer, auth helpers
 ├── admin/               # Admin dashboard & CRUD
 ├── user/                # User dashboard
-├── invoices/            # Generated PDFs (writable)
-├── pdf/                 # FPDF library + generator
+├── invoices/            # Reserved invoice storage
+├── pdf/                 # Invoice preview/download page
 ├── assets/              # CSS / JS
 ├── sql/                 # Database schema
 ├── index.php            # Home / events list
@@ -63,12 +63,41 @@ event-management/
 - `.htaccess` protection
 
 ## 🧾 Invoice Generation
-After registering for an event, the user is redirected to download a PDF invoice generated via **FPDF** (`pdf/generate_invoice.php`).
+After registering for an event, the user is redirected to an HTML invoice preview (`pdf/generate_invoice.php`) where they can print or save it as PDF from the browser.
+
+## Render Deployment
+This repository is prepared for Render with Docker.
+
+### Included deployment files
+- `Dockerfile`
+- `docker/start-apache.sh`
+- `render.yaml`
+- `.dockerignore`
+
+### Environment variables
+- `APP_BASE_URL`
+- `DB_HOST`
+- `DB_PORT`
+- `DB_NAME`
+- `DB_USER`
+- `DB_PASS`
+
+### Deploy steps
+1. Push this repository to GitHub.
+2. In Render, create a new **Web Service** from the repo.
+3. Use the `Docker` runtime.
+4. Keep the Dockerfile path as `./Dockerfile`.
+5. Set `APP_BASE_URL` to your Render public URL.
+6. Set the database environment variables.
+7. Import `sql/event_management_schema.sql` into your MySQL database.
+
+### Database note
+For the free setup, use an external MySQL provider. Render free plans cover the web service, but not a MySQL private service.
 
 ## 📖 Documentation
 - **[SETUP.md](./SETUP.md)** - Complete installation and configuration guide
 - **[Database Schema](./sql/event_management_schema.sql)** - SQL database structure
-- **[FPDF Info](./pdf/README.txt)** - Invoice generation info
+- **[FPDF Info](./pdf/README.txt)** - Legacy invoice generation info
 
 ## 🛠️ Verification
 Run the verification script to check if everything is set up correctly:

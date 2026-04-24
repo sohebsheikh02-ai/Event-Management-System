@@ -1,0 +1,15 @@
+.git
+.gitignore
+.codex
+README.md
+SETUP.md
+INSTALLATION_COMPLETE.md
+LIVE_TEST_REPORT.md
+QUICK_START.md
+UI_UPGRADE_COMPLETE.md
+verify_setup.sh
+invoice_test.pdf
+pdf/fpdf.zip
+pdf/fpdf_official.php
+invoices/*
+!invoices/.gitkeep
