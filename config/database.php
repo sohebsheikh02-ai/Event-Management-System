@@ -1,4 +1,5 @@
 <?php
+ob_start();
 
 function env_value($key, $default = null) {
     $value = getenv($key);

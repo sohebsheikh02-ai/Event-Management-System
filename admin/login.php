@@ -1,6 +1,6 @@
 <?php
-$page_title = 'Admin Login';
-require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/auth.php';
 
 $err='';
 if ($_SERVER['REQUEST_METHOD']==='POST') {
@@ -14,6 +14,9 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         header("Location: dashboard.php"); exit;
     } else $err='Invalid credentials.';
 }
+
+$page_title = 'Admin Login';
+require_once __DIR__ . '/../includes/header.php';
 ?>
 <div class="form-card">
   <h2>Admin Login</h2>

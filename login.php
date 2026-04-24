@@ -1,9 +1,9 @@
 <?php
-$page_title = 'Login';
-$err = '';
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/auth.php';
 
+$err = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    require_once __DIR__ . '/config/database.php';
     $email = trim($_POST['email'] ?? '');
     $pass  = $_POST['password'] ?? '';
     $stmt  = $conn->prepare("SELECT id,name,password FROM users WHERE email=?");
@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+$page_title = 'Login';
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="form-card">

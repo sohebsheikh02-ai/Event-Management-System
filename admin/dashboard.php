@@ -1,8 +1,9 @@
 <?php
-$page_title = 'Admin Dashboard';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_admin();
+
+$page_title = 'Admin Dashboard';
 require_once __DIR__ . '/../includes/header.php';
 
 $u = $conn->query("SELECT COUNT(*) c FROM users")->fetch_assoc()['c'];
