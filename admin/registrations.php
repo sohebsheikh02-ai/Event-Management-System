@@ -25,7 +25,10 @@ $rows=$conn->query("
         <td>₹<?php echo number_format($r['amount'],2); ?></td>
         <td><span class="badge <?php echo strtolower($r['status']); ?>"><?php echo sanitize($r['status']); ?></span></td>
         <td><?php echo date('d M Y',strtotime($r['registered_at'])); ?></td>
-        <td><a class="btn btn-primary btn-sm" href="<?php echo BASE_URL; ?>/pdf/generate_invoice.php?id=<?php echo $r['inv_id']; ?>">Download</a></td>
+        <td>
+          <a class="btn btn-primary btn-sm" href="<?php echo BASE_URL; ?>/pdf/generate_invoice.php?id=<?php echo $r['inv_id']; ?>">Preview</a>
+          <a class="btn btn-outline btn-sm" href="<?php echo BASE_URL; ?>/pdf/generate_invoice.php?id=<?php echo $r['inv_id']; ?>&download=html">HTML</a>
+        </td>
       </tr>
       <?php endwhile; ?>
     </tbody>

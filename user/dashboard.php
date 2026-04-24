@@ -33,7 +33,10 @@ $rows = $stmt->get_result();
         <td><?php echo sanitize($r['venue']); ?></td>
         <td><?php echo $r['price']==0?'Free':'₹'.number_format($r['price'],2); ?></td>
         <td><span class="badge <?php echo strtolower($r['status']); ?>"><?php echo sanitize($r['status']); ?></span></td>
-        <td><a class="btn btn-primary btn-sm" href="<?php echo BASE_URL; ?>/pdf/generate_invoice.php?id=<?php echo $r['inv_id']; ?>">Download</a></td>
+        <td>
+          <a class="btn btn-primary btn-sm" href="<?php echo BASE_URL; ?>/pdf/generate_invoice.php?id=<?php echo $r['inv_id']; ?>">Preview</a>
+          <!-- <a class="btn btn-outline btn-sm" href="<?php echo BASE_URL; ?>/pdf/generate_invoice.php?id=<?php echo $r['inv_id']; ?>&download=html">HTML</a> -->
+        </td>
       </tr>
       <?php endwhile; ?>
     </tbody>
