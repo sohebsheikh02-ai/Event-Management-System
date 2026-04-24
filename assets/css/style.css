@@ -702,6 +702,102 @@ tr:last-child td {
   font-weight: 600;
 }
 
+/* === Pagination === */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 8px 0 48px;
+}
+
+.page-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.9rem;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  transition: var(--transition);
+  text-decoration: none;
+  box-shadow: var(--shadow);
+}
+
+a.page-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.page-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.page-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  transition: var(--transition);
+  text-decoration: none;
+  box-shadow: var(--shadow);
+}
+
+a.page-num:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+.page-num.active {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.35);
+  cursor: default;
+}
+
+.page-ellipsis {
+  color: var(--muted);
+  font-weight: 600;
+  padding: 0 4px;
+  user-select: none;
+}
+
+.page-info {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0 6px;
+}
+
+@media (max-width: 600px) {
+  .page-info { display: none; }
+  .page-btn  { padding: 10px 14px; font-size: 0.85rem; }
+}
+
 /* === Event Details Page === */
 .event-detail {
   background: var(--surface);
